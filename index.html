@@ -13,8 +13,8 @@
       --card: #ffffff;
       --muted: #5b6b7a;
       --border: #d8e2ea;
-      --shadow: 0 10px 30px rgba(15, 92, 122, 0.08);
-      --hero-overlay: rgba(10, 37, 54, 0.62);
+      --shadow: 0 10px 30px rgba(15, 92, 122, 0.10);
+      --hero-overlay: rgba(8, 27, 40, 0.58);
     }
 
     * { box-sizing: border-box; }
@@ -29,8 +29,8 @@
     }
 
     header {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
@@ -68,7 +68,7 @@
     .nav a:hover { color: var(--accent); }
 
     .hero {
-      min-height: 70vh;
+      min-height: 74vh;
       display: flex;
       align-items: center;
       background:
@@ -104,7 +104,7 @@
     .subtitle {
       max-width: 720px;
       font-size: 1.15rem;
-      color: rgba(255,255,255,0.9);
+      color: rgba(255,255,255,0.92);
       margin-bottom: 1.5rem;
     }
 
@@ -125,6 +125,14 @@
       background: white;
       color: var(--text);
       box-shadow: var(--shadow);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .button:hover,
+    .file-button:hover,
+    .figure-card:hover,
+    .toggle-button:hover {
+      transform: translateY(-2px);
     }
 
     .button.primary {
@@ -163,19 +171,64 @@
 
     .data-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 1.25rem;
     }
 
-    .file-button {
+    .file-button,
+    .toggle-button {
       display: inline-block;
       margin-top: 0.8rem;
+      margin-right: 0.6rem;
       padding: 0.7rem 1rem;
       background: var(--accent-2);
       color: white;
       border-radius: 10px;
       text-decoration: none;
       font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .toggle-button.secondary {
+      background: #e9f2f6;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .table-container {
+      display: none;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+      background: white;
+    }
+
+    .table-container.active {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef5f8;
+      color: var(--accent);
+      position: sticky;
+      top: 0;
     }
 
     .gallery {
@@ -190,6 +243,8 @@
       border-radius: 18px;
       overflow: hidden;
       box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .figure-card img {
@@ -202,6 +257,49 @@
 
     .figure-card .caption { padding: 1rem; }
 
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 2000;
+      padding: 2rem;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: min(1100px, 92vw);
+      max-height: 75vh;
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      background: white;
+    }
+
+    .lightbox-caption {
+      color: white;
+      margin-top: 1rem;
+      max-width: 900px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
     footer {
       margin-top: 3rem;
       border-top: 1px solid var(--border);
@@ -212,8 +310,8 @@
 
     @media (max-width: 800px) {
       h1 { font-size: 2.4rem; }
+      .nav { flex-direction: column; align-items: flex-start; }
     }
-
   </style>
 </head>
 <body>
@@ -260,55 +358,123 @@
 
 <section id="overview">
   <h2 class="section-title">Quick Overview</h2>
-  <p class="section-intro">Key figures summarising the catalogue and available records.</p>
+  <p class="section-intro">Key figures summarising the catalogue and available records. Click any figure to enlarge it.</p>
 
   <div class="gallery">
-
-    <div class="figure-card">
+    <div class="figure-card" onclick="openLightbox('images/figure1.jpg', 'Figure 1. Replace caption.')">
       <img src="images/figure1.jpg" alt="Figure 1">
       <div class="caption"><strong>Figure 1.</strong> Replace caption.</div>
     </div>
 
-    <div class="figure-card">
+    <div class="figure-card" onclick="openLightbox('images/figure2.jpg', 'Figure 2. Replace caption.')">
       <img src="images/figure2.jpg" alt="Figure 2">
       <div class="caption"><strong>Figure 2.</strong> Replace caption.</div>
     </div>
 
-    <div class="figure-card">
+    <div class="figure-card" onclick="openLightbox('images/figure3.jpg', 'Figure 3. Replace caption.')">
       <img src="images/figure3.jpg" alt="Figure 3">
       <div class="caption"><strong>Figure 3.</strong> Replace caption.</div>
     </div>
 
-    <div class="figure-card">
+    <div class="figure-card" onclick="openLightbox('images/figure4.jpg', 'Figure 4. Replace caption.')">
       <img src="images/figure4.jpg" alt="Figure 4">
       <div class="caption"><strong>Figure 4.</strong> Replace caption.</div>
     </div>
-
   </div>
 </section>
 
 <section id="data">
   <h2 class="section-title">Data</h2>
-  <p class="section-intro">Download the catalogue tables containing digitised and undigitised tide records.</p>
+  <p class="section-intro">Download the catalogue files or expand the preview tables directly on the website.</p>
 
   <div class="data-grid">
 
     <div class="card">
       <h3>Digitised Historical Tide Records</h3>
       <p>Catalogue of historical tide records that have been digitised and are available for analysis.</p>
-
-      <!-- CHANGE FILE LINK HERE IF NEEDED -->
       <a class="file-button" href="Digitized Historical Tide Records.xlsx">Download File</a>
+      <button class="toggle-button secondary" onclick="toggleTable('digitised-table')">View on Site</button>
 
+      <div id="digitised-table" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Record ID</th>
+              <th>Location</th>
+              <th>Year Range</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>D001</td>
+              <td>Example Harbour</td>
+              <td>1880–1900</td>
+              <td>Digitised</td>
+              <td>Replace with your real data rows.</td>
+            </tr>
+            <tr>
+              <td>D002</td>
+              <td>Example Port</td>
+              <td>1901–1920</td>
+              <td>Digitised</td>
+              <td>Add or remove columns as needed.</td>
+            </tr>
+            <tr>
+              <td>D003</td>
+              <td>Example Station</td>
+              <td>1921–1935</td>
+              <td>Digitised</td>
+              <td>You can paste a larger table here later.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card">
       <h3>Undigitised Historical Tide Records</h3>
       <p>Catalogue of historical tide records that remain undigitised and may require future recovery work.</p>
-
-      <!-- CHANGE FILE LINK HERE IF NEEDED -->
       <a class="file-button" href="Undigitized Historical Tide Records.xlsx">Download File</a>
+      <button class="toggle-button secondary" onclick="toggleTable('undigitised-table')">View on Site</button>
 
+      <div id="undigitised-table" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Record ID</th>
+              <th>Location</th>
+              <th>Year Range</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>U001</td>
+              <td>Example Estuary</td>
+              <td>1875–1888</td>
+              <td>Undigitised</td>
+              <td>Replace with your real data rows.</td>
+            </tr>
+            <tr>
+              <td>U002</td>
+              <td>Example Coast</td>
+              <td>1890–1912</td>
+              <td>Undigitised</td>
+              <td>Add the columns you need.</td>
+            </tr>
+            <tr>
+              <td>U003</td>
+              <td>Example Dock</td>
+              <td>1913–1927</td>
+              <td>Undigitised</td>
+              <td>You can paste a larger table here later.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div>
@@ -327,16 +493,47 @@
   <h2 class="section-title">Contact</h2>
   <div class="card">
     <p>
-      Add your contact details here (name, institution, email).
+      Add your contact details here, such as your name, institution, and email address.
     </p>
   </div>
 </section>
 
 </main>
 
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" aria-label="Close image">&times;</button>
+  <img id="lightbox-image" src="" alt="Expanded figure">
+  <div id="lightbox-caption" class="lightbox-caption"></div>
+</div>
+
 <footer>
-© 2026 Historical Tide Record Catalogue
+  © 2026 Historical Tide Record Catalogue
 </footer>
+
+<script>
+  function toggleTable(id) {
+    const table = document.getElementById(id);
+    table.classList.toggle('active');
+  }
+
+  function openLightbox(imageSrc, captionText) {
+    document.getElementById('lightbox-image').src = imageSrc;
+    document.getElementById('lightbox-caption').textContent = captionText;
+    document.getElementById('lightbox').classList.add('active');
+  }
+
+  function closeLightbox(event) {
+    if (event.target.id === 'lightbox' || event.target.classList.contains('lightbox-close')) {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+  }
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+  });
+</script>
 
 </body>
 </html>
