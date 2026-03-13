@@ -21,7 +21,7 @@
       --muted: #5b6b7a;
       --border: #d8e2ea;
       --shadow: 0 10px 30px rgba(15, 92, 122, 0.10);
-      --hero-overlay: rgba(8, 27, 40, 0.58);
+      --hero-overlay: rgba(8, 27, 40, 0.48);
       --digitised: #1f8db3;
       --undigitised: #c0392b;
     }
@@ -82,7 +82,7 @@
       align-items: center;
       background:
         linear-gradient(var(--hero-overlay), var(--hero-overlay)),
-        url('images/hero-image.jpg') center/cover no-repeat;
+        url('giphy.gif') center/cover no-repeat;
       color: white;
     }
 
@@ -372,7 +372,7 @@
 
     #map-frame {
       width: 100%;
-      height: 420px;
+      height: 500px;
       border-radius: 16px;
       overflow: hidden;
       border: 1px solid var(--border);
@@ -437,7 +437,7 @@
       .nav { flex-direction: column; align-items: flex-start; }
       .dataset-tools,
       .map-controls { grid-template-columns: 1fr; }
-      #map-frame { height: 340px; }
+      #map-frame { height: 380px; }
       td { font-size: 0.76rem; padding: 0.5rem 0.5rem; }
       th { font-size: 0.72rem; padding: 0.5rem 0.5rem; }
     }
@@ -664,7 +664,7 @@
 
 <script>
   const PAGE_SIZE = 25;
-  const INITIAL_WORLD_ZOOM = 2;
+  const INITIAL_WORLD_ZOOM = 1;
   const MAP_MAX_ZOOM = 10;
 
   let map;
@@ -958,7 +958,7 @@
       text += ' Showing both datasets.';
     }
 
-    text += ` Initial map view is fixed to the fully zoomed-out level.`;
+    text += ' The initial map view is fully zoomed out and cannot zoom out further.';
 
     document.getElementById('map-status').textContent = text;
   }
