@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Historical Tide Record Catalogue</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+
   <style>
     :root {
       --bg: #f4f7fb;
@@ -15,6 +22,8 @@
       --border: #d8e2ea;
       --shadow: 0 10px 30px rgba(15, 92, 122, 0.10);
       --hero-overlay: rgba(8, 27, 40, 0.58);
+      --digitised: #1f8db3;
+      --undigitised: #c0392b;
     }
 
     * { box-sizing: border-box; }
@@ -158,7 +167,7 @@
     .section-intro {
       margin: 0 0 1.25rem;
       color: var(--muted);
-      max-width: 760px;
+      max-width: 820px;
     }
 
     .card {
@@ -255,7 +264,8 @@
       background: #fbfdff;
     }
 
-    .dataset-tools label {
+    .dataset-tools label,
+    .map-controls label {
       display: block;
       font-size: 0.82rem;
       color: var(--muted);
@@ -264,7 +274,8 @@
     }
 
     .dataset-tools input,
-    .dataset-tools select {
+    .dataset-tools select,
+    .map-controls select {
       width: 100%;
       padding: 0.65rem 0.75rem;
       border: 1px solid var(--border);
@@ -319,6 +330,60 @@
       transform: none;
     }
 
+    #map-frame {
+      width: 100%;
+      height: 560px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #dfe9ef;
+    }
+
+    .map-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 1rem 0 0.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--digitised);
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    }
+
+    .legend-square {
+      width: 14px;
+      height: 14px;
+      background: var(--undigitised);
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    }
+
+    .leaflet-popup-content {
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
     footer {
       margin-top: 3rem;
       border-top: 1px solid var(--border);
@@ -330,7 +395,9 @@
     @media (max-width: 800px) {
       h1 { font-size: 2.4rem; }
       .nav { flex-direction: column; align-items: flex-start; }
-      .dataset-tools { grid-template-columns: 1fr; }
+      .dataset-tools,
+      .map-controls { grid-template-columns: 1fr; }
+      #map-frame { height: 460px; }
     }
   </style>
 </head>
@@ -341,6 +408,7 @@
     <div class="brand">Historical Tide Record Catalogue</div>
     <nav>
       <a href="#about">About</a>
+      <a href="#map">Map</a>
       <a href="#data">Data</a>
       <a href="#citation">Citation</a>
       <a href="#contact">Contact</a>
@@ -378,12 +446,37 @@
 
 <section id="map">
   <h2 class="section-title">Interactive Map</h2>
-  <p class="section-intro">Explore example record locations on the map below. Later, these markers can be replaced with your full catalogue.</p>
+  <p class="section-intro">
+    This map now works without a Google Maps API key. It reads the coordinates directly from the uploaded spreadsheets and lets users switch between digitised records, undigitised records, or both.
+  </p>
 
   <div class="card">
-    <div id="map-frame" style="width: 100%; height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border);"></div>
-    <p style="margin-top: 1rem; color: var(--muted);">
-      This is a starter interactive map using example locations. We can later connect it to your real catalogue data so markers are generated automatically.
+    <div class="map-controls">
+      <div>
+        <label for="map-layer-filter">Show on map</label>
+        <select id="map-layer-filter">
+          <option value="both">Digitised + Undigitised</option>
+          <option value="digitised">Digitised only</option>
+          <option value="undigitised">Undigitised only</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="map-frame"></div>
+
+    <div class="map-legend">
+      <div class="legend-item">
+        <span class="legend-circle"></span>
+        <span>Digitised records</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-square"></span>
+        <span>Undigitised records</span>
+      </div>
+    </div>
+
+    <p style="margin-top: 1rem; color: var(--muted);" id="map-status">
+      Loading map data...
     </p>
   </div>
 </section>
@@ -520,8 +613,17 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
+
 <script>
   const PAGE_SIZE = 25;
+
+  let map;
+  let digitisedLayer;
+  let undigitisedLayer;
 
   const datasets = {
     digitised: {
@@ -550,11 +652,22 @@
         start: 'Record start',
         finish: 'Record finish'
       },
+      mapColumns: {
+        lat: 'Latitude',
+        lng: 'Longitude',
+        location: 'Location',
+        study: 'Study',
+        country: 'Country',
+        start: 'Record start',
+        finish: 'Record finish',
+        type: 'Data Type'
+      },
       sort: { column: null, direction: 'asc' },
       page: 1,
       rows: [],
       filteredRows: [],
-      headers: []
+      headers: [],
+      loaded: false
     },
     undigitised: {
       key: 'undigitised',
@@ -582,11 +695,22 @@
         start: 'Start',
         finish: 'Finish'
       },
+      mapColumns: {
+        lat: 'Latitude',
+        lng: 'Longitude',
+        location: 'Rough location',
+        study: 'Study',
+        country: 'Country',
+        start: 'Start',
+        finish: 'Finish',
+        type: 'Data Type'
+      },
       sort: { column: null, direction: 'asc' },
       page: 1,
       rows: [],
       filteredRows: [],
-      headers: []
+      headers: [],
+      loaded: false
     }
   };
 
@@ -637,6 +761,174 @@
     });
   }
 
+  function formatPopupValue(value, fallback = 'Not provided') {
+    const text = normalizeValue(value);
+    return text || fallback;
+  }
+
+  function isValidCoordinate(lat, lng) {
+    return Number.isFinite(lat) &&
+           Number.isFinite(lng) &&
+           lat >= -90 && lat <= 90 &&
+           lng >= -180 && lng <= 180;
+  }
+
+  function createSquareIcon() {
+    return L.divIcon({
+      className: '',
+      html: `
+        <div style="
+          width: 14px;
+          height: 14px;
+          background: #c0392b;
+          border: 2px solid white;
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+        "></div>
+      `,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+      popupAnchor: [0, -8]
+    });
+  }
+
+  function buildPopupContent(row, datasetKey) {
+    const mapCols = datasets[datasetKey].mapColumns;
+    const location = formatPopupValue(row[mapCols.location]);
+    const country = formatPopupValue(row[mapCols.country]);
+    const study = formatPopupValue(row[mapCols.study]);
+    const start = formatPopupValue(row[mapCols.start]);
+    const finish = formatPopupValue(row[mapCols.finish]);
+    const type = formatPopupValue(row[mapCols.type]);
+
+    return `
+      <div>
+        <strong>${location}</strong><br>
+        <strong>Dataset:</strong> ${datasetKey === 'digitised' ? 'Digitised' : 'Undigitised'}<br>
+        <strong>Country:</strong> ${country}<br>
+        <strong>Study:</strong> ${study}<br>
+        <strong>Data type:</strong> ${type}<br>
+        <strong>Years:</strong> ${start}–${finish}
+      </div>
+    `;
+  }
+
+  function initialiseMap() {
+    map = L.map('map-frame', {
+      worldCopyJump: true
+    }).setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    undigitisedLayer = L.layerGroup().addTo(map);
+    digitisedLayer = L.layerGroup().addTo(map);
+
+    document.getElementById('map-layer-filter').addEventListener('change', updateMapVisibility);
+  }
+
+  function rebuildMapLayers() {
+    if (!map || !digitisedLayer || !undigitisedLayer) return;
+
+    digitisedLayer.clearLayers();
+    undigitisedLayer.clearLayers();
+
+    const bounds = [];
+
+    datasets.digitised.rows.forEach(row => {
+      const lat = Number(row[datasets.digitised.mapColumns.lat]);
+      const lng = Number(row[datasets.digitised.mapColumns.lng]);
+
+      if (!isValidCoordinate(lat, lng)) return;
+
+      const marker = L.circleMarker([lat, lng], {
+        radius: 6,
+        color: '#ffffff',
+        weight: 1.5,
+        fillColor: '#1f8db3',
+        fillOpacity: 0.9
+      }).bindPopup(buildPopupContent(row, 'digitised'));
+
+      marker.addTo(digitisedLayer);
+      bounds.push([lat, lng]);
+    });
+
+    datasets.undigitised.rows.forEach(row => {
+      const lat = Number(row[datasets.undigitised.mapColumns.lat]);
+      const lng = Number(row[datasets.undigitised.mapColumns.lng]);
+
+      if (!isValidCoordinate(lat, lng)) return;
+
+      const marker = L.marker([lat, lng], {
+        icon: createSquareIcon()
+      }).bindPopup(buildPopupContent(row, 'undigitised'));
+
+      marker.addTo(undigitisedLayer);
+      bounds.push([lat, lng]);
+    });
+
+    updateMapVisibility();
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [30, 30] });
+    }
+
+    updateMapStatus();
+  }
+
+  function updateMapVisibility() {
+    const mode = document.getElementById('map-layer-filter').value;
+
+    if (mode === 'both' || mode === 'digitised') {
+      if (!map.hasLayer(digitisedLayer)) digitisedLayer.addTo(map);
+    } else {
+      if (map.hasLayer(digitisedLayer)) map.removeLayer(digitisedLayer);
+    }
+
+    if (mode === 'both' || mode === 'undigitised') {
+      if (!map.hasLayer(undigitisedLayer)) undigitisedLayer.addTo(map);
+    } else {
+      if (map.hasLayer(undigitisedLayer)) map.removeLayer(undigitisedLayer);
+    }
+
+    if (map.hasLayer(undigitisedLayer)) {
+      undigitisedLayer.bringToBack();
+    }
+    if (map.hasLayer(digitisedLayer)) {
+      digitisedLayer.bringToFront();
+    }
+
+    updateMapStatus();
+  }
+
+  function updateMapStatus() {
+    const mode = document.getElementById('map-layer-filter').value;
+    const digitisedCount = countValidMappedRows('digitised');
+    const undigitisedCount = countValidMappedRows('undigitised');
+
+    let text = `Mapped locations: ${digitisedCount} digitised, ${undigitisedCount} undigitised.`;
+
+    if (mode === 'digitised') {
+      text += ' Showing digitised records only.';
+    } else if (mode === 'undigitised') {
+      text += ' Showing undigitised records only.';
+    } else {
+      text += ' Showing both datasets.';
+    }
+
+    document.getElementById('map-status').textContent = text;
+  }
+
+  function countValidMappedRows(datasetKey) {
+    const dataset = datasets[datasetKey];
+    return dataset.rows.filter(row => {
+      const lat = Number(row[dataset.mapColumns.lat]);
+      const lng = Number(row[dataset.mapColumns.lng]);
+      return isValidCoordinate(lat, lng);
+    }).length;
+  }
+
   async function loadDataset(datasetKey) {
     const dataset = datasets[datasetKey];
     const meta = document.getElementById(dataset.metaId);
@@ -644,6 +936,7 @@
     try {
       const response = await fetch(dataset.file);
       if (!response.ok) throw new Error(`Could not load ${dataset.file}`);
+
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
       const worksheet = workbook.Sheets[dataset.sheet || workbook.SheetNames[0]];
@@ -658,6 +951,7 @@
       dataset.headers = headers;
       dataset.rows = rows;
       dataset.filteredRows = [...rows];
+      dataset.loaded = true;
 
       Object.entries(dataset.selectColumns).forEach(([filterName, columnName]) => {
         populateSelect(dataset.filters[filterName], getUniqueValues(rows, columnName), `All ${filterName}s`);
@@ -665,9 +959,14 @@
 
       attachDatasetEvents(datasetKey);
       applyFilters(datasetKey);
+
+      if (datasets.digitised.loaded && datasets.undigitised.loaded) {
+        rebuildMapLayers();
+      }
     } catch (error) {
       meta.textContent = `There was a problem loading ${dataset.file}. Make sure the spreadsheet is in the same folder as this HTML file.`;
       console.error(error);
+      document.getElementById('map-status').textContent = 'The map could not load one or both spreadsheet files.';
     }
   }
 
@@ -730,7 +1029,11 @@
       if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
         comparison = aNum - bNum;
       } else {
-        comparison = normalizeValue(aValue).localeCompare(normalizeValue(bValue), undefined, { numeric: true, sensitivity: 'base' });
+        comparison = normalizeValue(aValue).localeCompare(
+          normalizeValue(bValue),
+          undefined,
+          { numeric: true, sensitivity: 'base' }
+        );
       }
 
       return direction === 'asc' ? comparison : -comparison;
@@ -756,7 +1059,11 @@
 
     dataset.headers.forEach(header => {
       const th = document.createElement('th');
-      th.innerHTML = `${header}<span class="sort-indicator">${dataset.sort.column === header ? (dataset.sort.direction === 'asc' ? '▲' : '▼') : '↕'}</span>`;
+      th.innerHTML = `${header}<span class="sort-indicator">${
+        dataset.sort.column === header
+          ? (dataset.sort.direction === 'asc' ? '▲' : '▼')
+          : '↕'
+      }</span>`;
       th.addEventListener('click', () => toggleSort(datasetKey, header));
       headerRow.appendChild(th);
     });
@@ -797,6 +1104,7 @@
     meta.textContent = totalRows === 0
       ? '0 matching rows.'
       : `Showing ${startIndex + 1}-${Math.min(startIndex + PAGE_SIZE, totalRows)} of ${totalRows} matching rows.`;
+
     pageInfo.textContent = `Page ${dataset.page} of ${totalPages}`;
 
     const buttons = document.querySelectorAll(`#${dataset.containerId} .pager button`);
@@ -840,46 +1148,11 @@
     container.classList.toggle('active');
   }
 
-  function initMap() {
-    const locations = [
-      { name: 'Amsterdam, Netherlands', lat: 52.3676, lng: 4.9041 },
-      { name: 'Brest, France', lat: 48.3904, lng: -4.4861 },
-      { name: 'Sheerness, UK', lat: 51.4404, lng: 0.7629 },
-      { name: 'New York, USA', lat: 40.7128, lng: -74.0060 },
-      { name: 'Sydney, Australia', lat: -33.8688, lng: 151.2093 }
-    ];
-
-    const map = new google.maps.Map(document.getElementById('map-frame'), {
-      center: { lat: 20, lng: 0 },
-      zoom: 2,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true
-    });
-
-    locations.forEach((location) => {
-      const marker = new google.maps.Marker({
-        position: { lat: location.lat, lng: location.lng },
-        map,
-        title: location.name
-      });
-
-      const info = new google.maps.InfoWindow({
-        content: `<strong>${location.name}</strong><br>Example historical tide record location`
-      });
-
-      marker.addListener('click', () => {
-        info.open({ anchor: marker, map });
-      });
-    });
-  }
-
   window.addEventListener('DOMContentLoaded', () => {
+    initialiseMap();
     loadDataset('digitised');
     loadDataset('undigitised');
   });
 </script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
 </body>
 </html>
