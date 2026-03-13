@@ -419,6 +419,13 @@
       box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
     }
 
+    .map-disclaimer {
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-style: italic;
+    }
+
     .leaflet-popup-content {
       line-height: 1.5;
       font-size: 0.95rem;
@@ -517,8 +524,8 @@
       </div>
     </div>
 
-    <p style="margin-top: 1rem; color: var(--muted);" id="map-status">
-      Loading map data...
+    <p id="map-status" class="map-disclaimer">
+      <em>Disclaimer: Markers on the map show a rough indication of where the original record came from, not the exact location of the original record.</em>
     </p>
   </div>
 </section>
@@ -664,10 +671,8 @@
 
 <script>
   const PAGE_SIZE = 25;
-  const MAP_MIN_ZOOM = 1;
+  const INITIAL_WORLD_ZOOM = 1;
   const MAP_MAX_ZOOM = 10;
-  const INITIAL_CENTER = [0, 0];
-  const INITIAL_ZOOM = 2;
 
   let map;
   let digitisedLayer;
@@ -864,18 +869,14 @@
   function initialiseMap() {
     map = L.map('map-frame', {
       worldCopyJump: true,
-      minZoom: MAP_MIN_ZOOM,
+      minZoom: INITIAL_WORLD_ZOOM,
       maxZoom: MAP_MAX_ZOOM,
-      zoomSnap: 1,
-      maxBounds: [[-90, -180], [90, 180]],
-      maxBoundsViscosity: 1.0
-    }).setView(INITIAL_CENTER, INITIAL_ZOOM);
+      zoomSnap: 1
+    }).setView([20, 0], INITIAL_WORLD_ZOOM);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: MAP_MAX_ZOOM,
-      minZoom: MAP_MIN_ZOOM,
-      noWrap: true,
-      bounds: [[-90, -180], [90, 180]],
+      minZoom: INITIAL_WORLD_ZOOM,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
@@ -890,8 +891,6 @@
 
     digitisedLayer.clearLayers();
     undigitisedLayer.clearLayers();
-
-    const bounds = [];
 
     datasets.digitised.rows.forEach(row => {
       const lat = Number(row[datasets.digitised.mapColumns.lat]);
@@ -908,7 +907,6 @@
       }).bindPopup(buildPopupContent(row, 'digitised'));
 
       marker.addTo(digitisedLayer);
-      bounds.push([lat, lng]);
     });
 
     datasets.undigitised.rows.forEach(row => {
@@ -922,27 +920,11 @@
       }).bindPopup(buildPopupContent(row, 'undigitised'));
 
       marker.addTo(undigitisedLayer);
-      bounds.push([lat, lng]);
     });
 
     updateMapVisibility();
 
-    if (bounds.length > 0) {
-      const fitted = L.latLngBounds(bounds);
-      const worldTallBounds = L.latLngBounds(
-        [-90, fitted.getWest()],
-        [90, fitted.getEast()]
-      );
-
-      map.fitBounds(worldTallBounds, {
-        padding: [20, 20],
-        maxZoom: 3
-      });
-    } else {
-      map.setView(INITIAL_CENTER, INITIAL_ZOOM);
-    }
-
-    updateMapStatus();
+    map.setView([20, 0], INITIAL_WORLD_ZOOM);
   }
 
   function updateMapVisibility() {
@@ -962,37 +944,6 @@
 
     if (map.hasLayer(undigitisedLayer)) undigitisedLayer.bringToBack();
     if (map.hasLayer(digitisedLayer)) digitisedLayer.bringToFront();
-
-    updateMapStatus();
-  }
-
-  function updateMapStatus() {
-    const mode = document.getElementById('map-layer-filter').value;
-    const digitisedCount = countValidMappedRows('digitised');
-    const undigitisedCount = countValidMappedRows('undigitised');
-
-    let text = `Mapped locations: ${digitisedCount} digitised, ${undigitisedCount} undigitised.`;
-
-    if (mode === 'digitised') {
-      text += ' Showing digitised records only.';
-    } else if (mode === 'undigitised') {
-      text += ' Showing undigitised records only.';
-    } else {
-      text += ' Showing both datasets.';
-    }
-
-    text += ' The initial map view spans the full latitude range from -90 to 90.';
-
-    document.getElementById('map-status').textContent = text;
-  }
-
-  function countValidMappedRows(datasetKey) {
-    const dataset = datasets[datasetKey];
-    return dataset.rows.filter(row => {
-      const lat = Number(row[dataset.mapColumns.lat]);
-      const lng = Number(row[dataset.mapColumns.lng]);
-      return isValidCoordinate(lat, lng);
-    }).length;
   }
 
   async function loadDataset(datasetKey) {
@@ -1036,7 +987,6 @@
     } catch (error) {
       meta.textContent = `There was a problem loading ${dataset.file}. Make sure the spreadsheet is in the same folder as this HTML file.`;
       console.error(error);
-      document.getElementById('map-status').textContent = 'The map could not load one or both spreadsheet files.';
     }
   }
 
