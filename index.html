@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Historical Tide Record Catalogue</title>
+  <title>Tide Time Capsules: A Catalogue of Historical Tide Records</title>
 
   <link
     rel="stylesheet"
@@ -23,7 +23,7 @@
       --shadow: 0 10px 30px rgba(15, 92, 122, 0.10);
       --hero-overlay: rgba(8, 27, 40, 0.42);
       --digitised: #1f8db3;
-      --undigitised: #c0392b;
+      --undigitized: #c0392b;
     }
 
     * { box-sizing: border-box; }
@@ -91,16 +91,6 @@
       margin: 0 auto;
       padding: 5rem 1.25rem;
       width: 100%;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      background: rgba(255,255,255,0.14);
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: 0.45rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
     }
 
     h1 {
@@ -414,7 +404,7 @@
     .legend-square {
       width: 14px;
       height: 14px;
-      background: var(--undigitised);
+      background: var(--undigitized);
       border: 2px solid white;
       box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
     }
@@ -454,7 +444,9 @@
 
 <header>
   <div class="nav">
-    <div class="brand">Historical Tide Record Catalogue</div>
+    <!-- EDIT HEADER BRAND -->
+    <div class="brand">Tide Time Capsules </div>
+
     <nav>
       <a href="#about">About</a>
       <a href="#map">Map</a>
@@ -467,199 +459,227 @@
 
 <section class="hero" id="home">
   <div class="hero-inner">
-    <div class="hero-tag">Historical sea-level information</div>
-    <h1>Historical Tide Record Catalogue</h1>
+    <!-- EDIT HERO TITLE -->
+    <h1>Tide Time Capsules1</h1>
+
+    <!-- EDIT HERO SUBTITLE -->
     <p class="subtitle">
-      A catalogue of historical tide records including digitised datasets, undigitised archives, and supporting visual summaries.
+      A catalogue of historical tide records including digitised datasets, undigitized archives, and supporting visual summaries.
     </p>
+
     <div class="button-row">
       <a class="button primary" href="#data">Browse Data</a>
-      <a class="button" href="#map">Explore Map</a>
     </div>
   </div>
 </section>
 
 <main>
 
-<section id="about">
-  <h2 class="section-title">About</h2>
-  <div class="card">
-    <p>
-      Sea level rise is a major consequence of climate change, increasing the risk of flooding, erosion, and other impacts in coastal regions. Developing effective adaptation strategies requires accurate projections of future sea level change, which depend on long observational records.<br><br>
-      Tidal measurements have been collected for centuries and represent some of the longest continuous environmental datasets available. However, much of this information remains stored in historical paper records and has not yet been digitised, limiting its accessibility and use in scientific analysis. As a result, many existing sea level datasets extend back only to the late nineteenth century despite the existence of earlier observations.<br><br>
-      Data archaeology initiatives have demonstrated the value of recovering and digitising historical tide records. Examples include extended tide gauge records from Amsterdam (Netherlands), Brest (France), and Sheerness (UK). Nevertheless, many historical records remain undigitized and are at risk of deterioration or loss.<br><br>
-      This website provides a catalogue of historical tide records worldwide. The aim is to improve the discoverability of these records, support data rescue initiatives, and provide information that can help prioritise and plan digitisation efforts. By facilitating access to these historical observations, the catalogue contributes to the preservation and extension of long-term sea level datasets for use in climate research and coastal planning.
-    </p>
-  </div>
-</section>
-
-<section id="map">
-  <h2 class="section-title">Map of Records</h2>
-  <p class="section-intro">
-    This map works without a Google Maps key. It reads latitude and longitude directly from the spreadsheets and lets users show digitised records, undigitised records, or both.
-  </p>
-
-  <div class="card">
-    <div class="map-controls">
-      <div>
-        <label for="map-layer-filter">Show on map</label>
-        <select id="map-layer-filter">
-          <option value="both">Digitised + Undigitised</option>
-          <option value="digitised">Digitised only</option>
-          <option value="undigitised">Undigitised only</option>
-        </select>
-      </div>
-    </div>
-
-    <div id="map-frame"></div>
-
-    <div class="map-legend">
-      <div class="legend-item">
-        <span class="legend-circle"></span>
-        <span>Digitised records</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-square"></span>
-        <span>Undigitised records</span>
-      </div>
-    </div>
-
-    <p id="map-status" class="map-disclaimer">
-      <em>Disclaimer: Markers on the map show a rough indication of where the original record came from, not the exact location of the original record.</em>
-    </p>
-  </div>
-</section>
-
-<section id="data">
-  <h2 class="section-title">Data</h2>
-  <p class="section-intro">
-    Each catalogue file can be downloaded and also opened live on the page as a searchable, sortable table with filters.
-  </p>
-
-  <div class="data-grid">
+  <section id="about">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">About</h2>
 
     <div class="card">
-      <h3>Digitised Historical Tide Records</h3>
-      <p>Catalogue of historical tide records that have been digitised and are available for analysis.</p>
-      <a class="file-button" href="Digitised_Records_2026_03_13.xlsx" download>Download File</a>
-      <button class="toggle-button secondary" onclick="toggleDataset('digitised')">View Data</button>
-
-      <div id="digitised-table" class="table-container">
-        <div class="dataset-tools">
-          <div>
-            <label for="digitised-search">Search any field</label>
-            <input id="digitised-search" type="text" placeholder="Location, country, method, study...">
-          </div>
-          <div>
-            <label for="digitised-country">Country</label>
-            <select id="digitised-country"><option value="">All countries</option></select>
-          </div>
-          <div>
-            <label for="digitised-type">Data type</label>
-            <select id="digitised-type"><option value="">All data types</option></select>
-          </div>
-          <div>
-            <label for="digitised-method">Method</label>
-            <select id="digitised-method"><option value="">All methods</option></select>
-          </div>
-          <div>
-            <label for="digitised-start">Start year from</label>
-            <input id="digitised-start" type="number" placeholder="e.g. 1800">
-          </div>
-          <div>
-            <label for="digitised-finish">Finish year to</label>
-            <input id="digitised-finish" type="number" placeholder="e.g. 1950">
-          </div>
-        </div>
-        <div class="dataset-meta" id="digitised-meta">Loading spreadsheet...</div>
-        <div class="table-scroll">
-          <table id="digitised-live-table"></table>
-        </div>
-        <div class="empty-message" id="digitised-empty">No rows match the current filters.</div>
-        <div class="pager">
-          <div id="digitised-page-info">Page 1</div>
-          <div>
-            <button type="button" onclick="changePage('digitised', -1)">Previous</button>
-            <button type="button" onclick="changePage('digitised', 1)">Next</button>
-            <button type="button" class="clear-button" onclick="resetFilters('digitised')">Clear filters</button>
-          </div>
-        </div>
-      </div>
+      <!-- EDIT ABOUT TEXT -->
+      <p>
+        Sea level rise is a major consequence of climate change, increasing the risk of flooding, erosion, and other impacts in coastal regions. Developing effective adaptation strategies requires accurate projections of future sea level change, which depend on long observational records.<br><br>
+        Tidal measurements have been collected for centuries and represent some of the longest continuous environmental datasets available. However, much of this information remains stored in historical paper records and has not yet been digitised, limiting its accessibility and use in scientific analysis. As a result, many existing sea level datasets extend back only to the late nineteenth century despite the existence of earlier observations.<br><br>
+        Data archaeology initiatives have demonstrated the value of recovering and digitising historical tide records. Examples include extended tide gauge records from Amsterdam (Netherlands), Brest (France), and Sheerness (UK). Nevertheless, many historical records remain undigitized and are at risk of deterioration or loss.<br><br>
+        This website provides a catalogue of historical tide records worldwide. The aim is to improve the discoverability of these records, support data rescue initiatives, and provide information that can help prioritise and plan digitisation efforts. By facilitating access to these historical observations, the catalogue contributes to the preservation and extension of long-term sea level datasets for use in climate research and coastal planning.
+      </p>
     </div>
+  </section>
+
+  <section id="map">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">Map of Records</h2>
+
+    <!-- EDIT SECTION INTRO -->
+    <p class="section-intro">
+      This map works without a Google Maps key. It reads latitude and longitude directly from the spreadsheets and lets users show digitised records, undigitized records, or both.
+    </p>
 
     <div class="card">
-      <h3>Undigitised Historical Tide Records</h3>
-      <p>Catalogue of historical tide records that remain undigitised and may require future recovery work.</p>
-      <a class="file-button" href="Undigitized_Records_2026_03_13.xlsx" download>Download File</a>
-      <button class="toggle-button secondary" onclick="toggleDataset('undigitised')">View Data</button>
+      <div class="map-controls">
+        <div>
+          <!-- EDIT MAP FILTER LABEL -->
+          <label for="map-layer-filter">Show on map</label>
+          <select id="map-layer-filter">
+            <option value="both">All Records</option>
+            <option value="digitised">Digitised Records</option>
+            <option value="undigitised">Undigitized Records</option>
+          </select>
+        </div>
+      </div>
 
-      <div id="undigitised-table" class="table-container">
-        <div class="dataset-tools">
-          <div>
-            <label for="undigitised-search">Search any field</label>
-            <input id="undigitised-search" type="text" placeholder="Location, country, source, type...">
-          </div>
-          <div>
-            <label for="undigitised-country">Country</label>
-            <select id="undigitised-country"><option value="">All countries</option></select>
-          </div>
-          <div>
-            <label for="undigitised-type">Data type</label>
-            <select id="undigitised-type"><option value="">All data types</option></select>
-          </div>
-          <div>
-            <label for="undigitised-study">Study</label>
-            <select id="undigitised-study"><option value="">All studies</option></select>
-          </div>
-          <div>
-            <label for="undigitised-start">Start year from</label>
-            <input id="undigitised-start" type="number" placeholder="e.g. 1800">
-          </div>
-          <div>
-            <label for="undigitised-finish">Finish year to</label>
-            <input id="undigitised-finish" type="number" placeholder="e.g. 1950">
-          </div>
+      <div id="map-frame"></div>
+
+      <div class="map-legend">
+        <div class="legend-item">
+          <span class="legend-circle"></span>
+          <!-- EDIT LEGEND LABEL -->
+          <span>Digitised records</span>
         </div>
-        <div class="dataset-meta" id="undigitised-meta">Loading spreadsheet...</div>
-        <div class="table-scroll">
-          <table id="undigitised-live-table"></table>
+        <div class="legend-item">
+          <span class="legend-square"></span>
+          <!-- EDIT LEGEND LABEL -->
+          <span>Undigitized records</span>
         </div>
-        <div class="empty-message" id="undigitised-empty">No rows match the current filters.</div>
-        <div class="pager">
-          <div id="undigitised-page-info">Page 1</div>
-          <div>
-            <button type="button" onclick="changePage('undigitised', -1)">Previous</button>
-            <button type="button" onclick="changePage('undigitised', 1)">Next</button>
-            <button type="button" class="clear-button" onclick="resetFilters('undigitised')">Clear filters</button>
+      </div>
+
+      <!-- EDIT MAP DISCLAIMER -->
+      <p id="map-status" class="map-disclaimer">
+        <em>Disclaimer: Markers on the map show a rough indication of where the original record came from, not the exact location of the original record.</em>
+      </p>
+    </div>
+  </section>
+
+  <section id="data">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">Data</h2>
+
+    <!-- EDIT SECTION INTRO -->
+    <p class="section-intro">
+      Each catalogue file can be downloaded and also opened live on the page as a searchable, sortable table with filters.
+    </p>
+
+    <div class="data-grid">
+
+      <div class="card">
+        <!-- EDIT DATASET HEADING -->
+        <h3>Digitised Historical Tide Records</h3>
+
+        <!-- EDIT DATASET DESCRIPTION -->
+        <p>Catalogue of historical tide records that have been digitised and are available for analysis.</p>
+
+        <a class="file-button" href="Digitised_Records_2026_03_13.xlsx" download>Download File</a>
+        <button class="toggle-button secondary" onclick="toggleDataset('digitised')">View Data</button>
+
+        <div id="digitised-table" class="table-container">
+          <div class="dataset-tools">
+            <div>
+              <label for="digitised-search">Search any field</label>
+              <input id="digitised-search" type="text" placeholder="Location, country, method, study...">
+            </div>
+            <div>
+              <label for="digitised-country">Country</label>
+              <select id="digitised-country"><option value="">All countries</option></select>
+            </div>
+            <div>
+              <label for="digitised-type">Data type</label>
+              <select id="digitised-type"><option value="">All data types</option></select>
+            </div>
+            <div>
+              <label for="digitised-method">Method</label>
+              <select id="digitised-method"><option value="">All methods</option></select>
+            </div>
+            <div>
+              <label for="digitised-start">Start year from</label>
+              <input id="digitised-start" type="number" placeholder="e.g. 1800">
+            </div>
+            <div>
+              <label for="digitised-finish">Finish year to</label>
+              <input id="digitised-finish" type="number" placeholder="e.g. 1950">
+            </div>
+          </div>
+          <div class="dataset-meta" id="digitised-meta">Loading spreadsheet...</div>
+          <div class="table-scroll">
+            <table id="digitised-live-table"></table>
+          </div>
+          <div class="empty-message" id="digitised-empty">No rows match the current filters.</div>
+          <div class="pager">
+            <div id="digitised-page-info">Page 1</div>
+            <div>
+              <button type="button" onclick="changePage('digitised', -1)">Previous</button>
+              <button type="button" onclick="changePage('digitised', 1)">Next</button>
+              <button type="button" class="clear-button" onclick="resetFilters('digitised')">Clear filters</button>
+            </div>
           </div>
         </div>
       </div>
+
+      <div class="card">
+        <!-- EDIT DATASET HEADING -->
+        <h3>Undigitized Historical Tide Records</h3>
+
+        <!-- EDIT DATASET DESCRIPTION -->
+        <p>Catalogue of historical tide records that remain undigitized and may require future recovery work.</p>
+
+        <a class="file-button" href="Undigitized_Records_2026_03_13.xlsx" download>Download File</a>
+        <button class="toggle-button secondary" onclick="toggleDataset('undigitised')">View Data</button>
+
+        <div id="undigitised-table" class="table-container">
+          <div class="dataset-tools">
+            <div>
+              <label for="undigitised-search">Search any field</label>
+              <input id="undigitised-search" type="text" placeholder="Location, country, source, type...">
+            </div>
+            <div>
+              <label for="undigitised-country">Country</label>
+              <select id="undigitised-country"><option value="">All countries</option></select>
+            </div>
+            <div>
+              <label for="undigitised-type">Data type</label>
+              <select id="undigitised-type"><option value="">All data types</option></select>
+            </div>
+            <div>
+              <label for="undigitised-study">Study</label>
+              <select id="undigitised-study"><option value="">All studies</option></select>
+            </div>
+            <div>
+              <label for="undigitised-start">Start year from</label>
+              <input id="undigitised-start" type="number" placeholder="e.g. 1800">
+            </div>
+            <div>
+              <label for="undigitised-finish">Finish year to</label>
+              <input id="undigitised-finish" type="number" placeholder="e.g. 1950">
+            </div>
+          </div>
+          <div class="dataset-meta" id="undigitised-meta">Loading spreadsheet...</div>
+          <div class="table-scroll">
+            <table id="undigitised-live-table"></table>
+          </div>
+          <div class="empty-message" id="undigitised-empty">No rows match the current filters.</div>
+          <div class="pager">
+            <div id="undigitised-page-info">Page 1</div>
+            <div>
+              <button type="button" onclick="changePage('undigitised', -1)">Previous</button>
+              <button type="button" onclick="changePage('undigitised', 1)">Next</button>
+              <button type="button" class="clear-button" onclick="resetFilters('undigitised')">Clear filters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-  </div>
-</section>
+  <section id="citation">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">Citation</h2>
+    <div class="card">
+      <!-- EDIT CITATION TEXT -->
+      <p>
+        Add your preferred citation here so users know how to reference this catalogue and repository.
+      </p>
+    </div>
+  </section>
 
-<section id="citation">
-  <h2 class="section-title">Citation</h2>
-  <div class="card">
-    <p>
-      Add your preferred citation here so users know how to reference this catalogue and repository.
-    </p>
-  </div>
-</section>
-
-<section id="contact">
-  <h2 class="section-title">Contact</h2>
-  <div class="card">
-    <p>
-      Add your contact details here, such as your name, institution, and email address.
-    </p>
-  </div>
-</section>
+  <section id="contact">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">Contact</h2>
+    <div class="card">
+      <!-- EDIT CONTACT TEXT -->
+      <p>
+        Add your contact details here, such as your name, institution, and email address.
+      </p>
+    </div>
+  </section>
 
 </main>
 
 <footer>
+  <!-- EDIT FOOTER TEXT -->
   © 2026 Historical Tide Record Catalogue
 </footer>
 
@@ -857,7 +877,7 @@
     return `
       <div>
         <strong>${location}</strong><br>
-        <strong>Dataset:</strong> ${datasetKey === 'digitised' ? 'Digitised' : 'Undigitised'}<br>
+        <strong>Dataset:</strong> ${datasetKey === 'digitised' ? 'Digitised' : 'Undigitized'}<br>
         <strong>Country:</strong> ${country}<br>
         <strong>Study:</strong> ${study}<br>
         <strong>Data type:</strong> ${type}<br>
