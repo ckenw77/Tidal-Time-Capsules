@@ -1,6 +1,6 @@
 Creative Commons Attribution 4.0 International (CC BY 4.0)
 
-Copyright (c) 2026 Chris Kenwright
+Copyright (c) 2026 Christian Kenwright
 
 This repository and its contents are licensed under the
 Creative Commons Attribution 4.0 International License.
