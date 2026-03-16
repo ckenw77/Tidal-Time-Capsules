@@ -421,6 +421,28 @@
       font-size: 0.95rem;
     }
 
+    .citation-block {
+      margin: 0 0 1.5rem 0;
+      padding: 1rem 1.1rem;
+      background: #fbfdff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .citation-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .citation-label {
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .citation-text {
+      margin: 0;
+    }
+
     footer {
       margin-top: 3rem;
       border-top: 1px solid var(--border);
@@ -535,7 +557,6 @@
     <h2 class="section-title">Data</h2>
 
     <div class="data-grid">
-
       <div class="card">
         <!-- EDIT DATASET HEADING -->
         <h3>Digitised Historical Tide Records</h3>
@@ -641,7 +662,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
@@ -684,22 +704,25 @@
     </div>
   </section>
 
-<section id="citation">
-  <h2 class="section-title">Citation</h2>
-  <div class="card">
-    <p><strong>If you use this site, please cite it as:</strong></p>
+  <section id="citation">
+    <!-- EDIT SECTION HEADING -->
+    <h2 class="section-title">Citation</h2>
+    <div class="card">
+      <div class="citation-block">
+        <p class="citation-label">If you use this site, please cite it as:</p>
+        <p class="citation-text">
+          Kenwright, C., DATE, <em>Tidal Time Capsules: A Global Catalogue of Historical Tide Records</em>, available at: .................................
+        </p>
+      </div>
 
-    <p style="margin: 0 0 1.25rem 0;">
-      Kenwright, C., DATE, <em>Tidal Time Capsules: A Global Catalogue of Historical Tide Records</em>, available at: .................................
-    </p>
-
-    <p><strong>Additionally, please cite the paper that details the work behind this site:</strong></p>
-
-    <p style="margin: 0;">
-      Kenwright, C., Haigh, I.D., Williams, J., Chan, D., Nicholls, R.J., McFarland, S. and Becker, M., (DATE) <em>Tidal Time Capsules: A Global Catalogue of Historical Tide Records</em>. Journal, VOL, PAGE.
-    </p>
-  </div>
-</section>
+      <div class="citation-block">
+        <p class="citation-label">Additionally, please cite the paper that details the work behind this site:</p>
+        <p class="citation-text">
+          Kenwright, C., Haigh, I.D., Williams, J., Chan, D., Nicholls, R.J., McFarland, S. and Becker, M., (DATE) <em>Tidal Time Capsules: A Global Catalogue of Historical Tide Records</em>. Journal, VOL, PAGE.
+        </p>
+      </div>
+    </div>
+  </section>
 
   <section id="contact">
     <!-- EDIT SECTION HEADING -->
@@ -849,16 +872,11 @@
       .map(header => String(header).trim());
   }
 
-  function rowObject(headers, row) {
-    const obj = {};
-    headers.forEach((header, index) => {
-      const value = row[index];
-      obj[header] = value === undefined || value === null ? '' : value;
-    });
-    return obj;
-  }
-
   function normalizeValue(value) {
+    if (value && typeof value === 'object') {
+      if (value.text !== undefined && value.text !== null) return String(value.text).trim();
+      return '';
+    }
     return value === null || value === undefined ? '' : String(value).trim();
   }
 
@@ -923,6 +941,58 @@
     });
   }
 
+  function worksheetToRowsWithLinks(worksheet) {
+    const ref = worksheet['!ref'];
+    if (!ref) return { headers: [], rows: [] };
+
+    const range = XLSX.utils.decode_range(ref);
+    const headers = [];
+    const rows = [];
+
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: range.s.r, c });
+      const cell = worksheet[cellAddress];
+      headers.push(cell && cell.v !== undefined ? String(cell.v).trim() : '');
+    }
+
+    for (let r = range.s.r + 1; r <= range.e.r; r++) {
+      const row = {};
+      let hasData = false;
+
+      for (let c = range.s.c; c <= range.e.c; c++) {
+        const header = headers[c - range.s.c];
+        if (!header) continue;
+
+        const cellAddress = XLSX.utils.encode_cell({ r, c });
+        const cell = worksheet[cellAddress];
+
+        if (!cell) {
+          row[header] = '';
+          continue;
+        }
+
+        const value = cell.v !== undefined ? cell.v : '';
+
+        if (cell.l && cell.l.Target) {
+          row[header] = {
+            text: value === undefined || value === null || value === '' ? cell.l.Target : String(value),
+            url: cell.l.Target
+          };
+        } else {
+          row[header] = value;
+        }
+
+        if (normalizeValue(row[header]) !== '') {
+          hasData = true;
+        }
+      }
+
+      if (hasData) rows.push(row);
+    }
+
+    return { headers, rows };
+  }
+
   function buildPopupContent(row, datasetKey) {
     const mapCols = datasets[datasetKey].mapColumns;
     const location = formatPopupValue(row[mapCols.location]);
@@ -971,8 +1041,8 @@
     undigitisedLayer.clearLayers();
 
     datasets.digitised.rows.forEach(row => {
-      const lat = Number(row[datasets.digitised.mapColumns.lat]);
-      const lng = Number(row[datasets.digitised.mapColumns.lng]);
+      const lat = Number(normalizeValue(row[datasets.digitised.mapColumns.lat]));
+      const lng = Number(normalizeValue(row[datasets.digitised.mapColumns.lng]));
 
       if (!isValidCoordinate(lat, lng)) return;
 
@@ -988,8 +1058,8 @@
     });
 
     datasets.undigitised.rows.forEach(row => {
-      const lat = Number(row[datasets.undigitised.mapColumns.lat]);
-      const lng = Number(row[datasets.undigitised.mapColumns.lng]);
+      const lat = Number(normalizeValue(row[datasets.undigitised.mapColumns.lat]));
+      const lng = Number(normalizeValue(row[datasets.undigitised.mapColumns.lng]));
 
       if (!isValidCoordinate(lat, lng)) return;
 
@@ -1032,15 +1102,14 @@
       if (!response.ok) throw new Error(`Could not load ${dataset.file}`);
 
       const arrayBuffer = await response.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const workbook = XLSX.read(arrayBuffer, { type: 'array', cellStyles: true, cellFormula: true, cellHTML: false });
       const worksheet = workbook.Sheets[dataset.sheet || workbook.SheetNames[0]];
-      const raw = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+      const parsed = worksheetToRowsWithLinks(worksheet);
 
-      const headers = cleanHeaders(raw[0] || []);
-      const rows = raw
-        .slice(1)
-        .map(row => rowObject(headers, row))
-        .filter(row => Object.values(row).some(value => normalizeValue(value) !== ''));
+      const headers = cleanHeaders(parsed.headers);
+      const rows = parsed.rows.filter(row =>
+        Object.values(row).some(value => normalizeValue(value) !== '')
+      );
 
       dataset.headers = headers;
       dataset.rows = rows;
@@ -1113,8 +1182,8 @@
       }
 
       if (dataset.yearColumns && dataset.yearColumns.start && dataset.yearColumns.finish) {
-        const rowStart = parseFloat(row[dataset.yearColumns.start]);
-        const rowFinish = parseFloat(row[dataset.yearColumns.finish]);
+        const rowStart = parseFloat(normalizeValue(row[dataset.yearColumns.start]));
+        const rowFinish = parseFloat(normalizeValue(row[dataset.yearColumns.finish]));
 
         if (!Number.isNaN(startYear) && (Number.isNaN(rowStart) || rowStart < startYear)) return false;
         if (!Number.isNaN(finishYear) && (Number.isNaN(rowFinish) || rowFinish > finishYear)) return false;
@@ -1132,17 +1201,17 @@
     if (!column) return [...rows];
 
     return [...rows].sort((a, b) => {
-      const aValue = a[column];
-      const bValue = b[column];
-      const aNum = parseFloat(aValue);
-      const bNum = parseFloat(bValue);
+      const aValue = normalizeValue(a[column]);
+      const bValue = normalizeValue(b[column]);
+      const aNum = parseFloat(String(aValue).replace(/,/g, '').replace(/[^\d.\-]/g, ''));
+      const bNum = parseFloat(String(bValue).replace(/,/g, '').replace(/[^\d.\-]/g, ''));
 
       let comparison = 0;
       if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
         comparison = aNum - bNum;
       } else {
-        comparison = normalizeValue(aValue).localeCompare(
-          normalizeValue(bValue),
+        comparison = aValue.localeCompare(
+          bValue,
           undefined,
           { numeric: true, sensitivity: 'base' }
         );
@@ -1153,130 +1222,140 @@
   }
 
   function renderTable(datasetKey) {
-  const dataset = datasets[datasetKey];
-  const table = document.getElementById(dataset.tableId);
-  const meta = document.getElementById(dataset.metaId);
-  const empty = document.getElementById(dataset.emptyId);
-  const pageInfo = document.getElementById(dataset.pageInfoId);
+    const dataset = datasets[datasetKey];
+    const table = document.getElementById(dataset.tableId);
+    const meta = document.getElementById(dataset.metaId);
+    const empty = document.getElementById(dataset.emptyId);
+    const pageInfo = document.getElementById(dataset.pageInfoId);
 
-  let visibleHeaders = dataset.headers;
+    let visibleHeaders = dataset.headers;
 
-  // Remove Resolution column from the digitised records table
-  if (datasetKey === 'digitised') {
-    visibleHeaders = visibleHeaders.filter(
-      header => header.trim().toLowerCase() !== 'resolution'
-    );
-  }
+    if (datasetKey === 'digitised') {
+      visibleHeaders = visibleHeaders.filter(header => {
+        const cleaned = String(header).trim().toLowerCase();
+        return !cleaned.includes('resolution');
+      });
+    }
 
-  // For the tools table, only show these three columns
-if (datasetKey === 'tools') {
-  visibleHeaders = visibleHeaders.filter(header => {
-    const cleaned = String(header).trim().toLowerCase();
+    if (datasetKey === 'tools') {
+      visibleHeaders = visibleHeaders.filter(header => {
+        const cleaned = String(header).trim().toLowerCase();
+        return (
+          cleaned.includes('tool') ||
+          cleaned.includes('price') ||
+          cleaned.includes('cost') ||
+          cleaned === 'link'
+        );
+      });
+    }
 
-    return (
-      cleaned.includes('tool') ||
-      cleaned.includes('price') ||
-      cleaned.includes('cost') ||
-      cleaned === 'link'
-    );
-  });
-}
+    const totalRows = dataset.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+    dataset.page = Math.min(dataset.page, totalPages);
 
-  const totalRows = dataset.filteredRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
-  dataset.page = Math.min(dataset.page, totalPages);
+    const startIndex = (dataset.page - 1) * PAGE_SIZE;
+    const rowsForPage = dataset.filteredRows.slice(startIndex, startIndex + PAGE_SIZE);
 
-  const startIndex = (dataset.page - 1) * PAGE_SIZE;
-  const rowsForPage = dataset.filteredRows.slice(startIndex, startIndex + PAGE_SIZE);
-
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
-
-  visibleHeaders.forEach(header => {
-    const th = document.createElement('th');
-    th.title = header;
-    th.innerHTML = `${header}<span class="sort-indicator">${
-      dataset.sort.column === header
-        ? (dataset.sort.direction === 'asc' ? '▲' : '▼')
-        : '↕'
-    }</span>`;
-    th.addEventListener('click', () => toggleSort(datasetKey, header));
-    headerRow.appendChild(th);
-  });
-
-  thead.appendChild(headerRow);
-
-  const tbody = document.createElement('tbody');
-
-  rowsForPage.forEach(row => {
-    const tr = document.createElement('tr');
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
 
     visibleHeaders.forEach(header => {
-      const td = document.createElement('td');
-      const value = row[header];
-      let text = normalizeValue(value);
-
-      // Round selected numeric columns to 2 decimal places
-      const cleanedHeader = String(header).trim().toLowerCase();
-      
-      if (
-        cleanedHeader === 'latitude' ||
-        cleanedHeader === 'longitude' ||
-        cleanedHeader.includes('recorded years') ||
-        cleanedHeader.includes('missing years')
-      ) {
-        const num = Number(text);
-        if (!Number.isNaN(num)) {
-          text = num.toFixed(2);
-        }
-      }
-
-      td.title = text;
-
-      const isLinkColumn = header.toLowerCase().trim() === 'link';
-      const looksLikeUrl = /^https?:\/\//i.test(text);
-
-      if (isLinkColumn && looksLikeUrl) {
-        const a = document.createElement('a');
-        a.href = text;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'cell-link';
-        a.textContent = text;
-        a.title = text;
-        td.appendChild(a);
-      } else {
-        const span = document.createElement('span');
-        span.className = 'cell-clip';
-        span.textContent = text;
-        span.title = text;
-        td.appendChild(span);
-      }
-
-      tr.appendChild(td);
+      const th = document.createElement('th');
+      th.title = header;
+      th.innerHTML = `${header}<span class="sort-indicator">${
+        dataset.sort.column === header
+          ? (dataset.sort.direction === 'asc' ? '▲' : '▼')
+          : '↕'
+      }</span>`;
+      th.addEventListener('click', () => toggleSort(datasetKey, header));
+      headerRow.appendChild(th);
     });
 
-    tbody.appendChild(tr);
-  });
+    thead.appendChild(headerRow);
 
-  table.innerHTML = '';
-  table.appendChild(thead);
-  table.appendChild(tbody);
+    const tbody = document.createElement('tbody');
 
-  empty.classList.toggle('active', totalRows === 0);
-  meta.textContent = totalRows === 0
-    ? '0 matching rows.'
-    : `Showing ${startIndex + 1}-${Math.min(startIndex + PAGE_SIZE, totalRows)} of ${totalRows} matching rows.`;
+    rowsForPage.forEach(row => {
+      const tr = document.createElement('tr');
 
-  pageInfo.textContent = `Page ${dataset.page} of ${totalPages}`;
+      visibleHeaders.forEach(header => {
+        const td = document.createElement('td');
+        const value = row[header];
+        let text = normalizeValue(value);
 
-  const buttons = document.querySelectorAll(`#${dataset.containerId} .pager button`);
-  if (buttons.length >= 2) {
-    buttons[0].disabled = dataset.page <= 1;
-    buttons[1].disabled = dataset.page >= totalPages;
+        const cleanedHeader = String(header).trim().toLowerCase();
+        const numericText = text.replace(/,/g, '').replace(/[^\d.\-]/g, '');
+        const num = Number(numericText);
+
+        const shouldRoundTwoDecimals =
+          cleanedHeader === 'latitude' ||
+          cleanedHeader === 'longitude' ||
+          (cleanedHeader.includes('recorded') && cleanedHeader.includes('year')) ||
+          (cleanedHeader.includes('missing') && cleanedHeader.includes('year'));
+
+        if (shouldRoundTwoDecimals && text !== '' && !Number.isNaN(num)) {
+          text = num.toFixed(2);
+        }
+
+        const isPriceColumn =
+          datasetKey === 'tools' &&
+          (cleanedHeader.includes('price') || cleanedHeader.includes('cost'));
+
+        if (isPriceColumn && text !== '' && !Number.isNaN(num)) {
+          text = num.toFixed(2);
+        }
+
+        td.title = text;
+
+        let linkUrl = null;
+        if (value && typeof value === 'object' && value.url) {
+          linkUrl = value.url;
+        } else if (/^https?:\/\//i.test(text)) {
+          linkUrl = text;
+        }
+
+        const isLinkColumn = cleanedHeader === 'link';
+
+        if (isLinkColumn && linkUrl) {
+          const a = document.createElement('a');
+          a.href = linkUrl;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'cell-link';
+          a.textContent = text || linkUrl;
+          a.title = linkUrl;
+          td.appendChild(a);
+        } else {
+          const span = document.createElement('span');
+          span.className = 'cell-clip';
+          span.textContent = text;
+          span.title = text;
+          td.appendChild(span);
+        }
+
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.innerHTML = '';
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    empty.classList.toggle('active', totalRows === 0);
+    meta.textContent = totalRows === 0
+      ? '0 matching rows.'
+      : `Showing ${startIndex + 1}-${Math.min(startIndex + PAGE_SIZE, totalRows)} of ${totalRows} matching rows.`;
+
+    pageInfo.textContent = `Page ${dataset.page} of ${totalPages}`;
+
+    const buttons = document.querySelectorAll(`#${dataset.containerId} .pager button`);
+    if (buttons.length >= 2) {
+      buttons[0].disabled = dataset.page <= 1;
+      buttons[1].disabled = dataset.page >= totalPages;
+    }
   }
-}
-
 
   function toggleSort(datasetKey, column) {
     const dataset = datasets[datasetKey];
