@@ -1289,26 +1289,30 @@
         let text = normalizeValue(value);
 
         const cleanedHeader = String(header).trim().toLowerCase();
-        const numericText = text.replace(/,/g, '').replace(/[^\d.\-]/g, '');
-        const num = Number(numericText);
-
+        const numericText = text.replace(/,/g, '').replace(/[^\d.\-]/g, '').trim();
+        
+        // Only treat as numeric if something numeric actually remains
+        const hasNumericContent = numericText !== '' && numericText !== '-' && numericText !== '.' && numericText !== '-.';
+        const num = hasNumericContent ? Number(numericText) : NaN;
+        
         const shouldRoundTwoDecimals =
           cleanedHeader === 'latitude' ||
           cleanedHeader === 'longitude' ||
           (cleanedHeader.includes('recorded') && cleanedHeader.includes('year')) ||
           (cleanedHeader.includes('missing') && cleanedHeader.includes('year'));
-
-        if (shouldRoundTwoDecimals && text !== '' && !Number.isNaN(num)) {
+        
+        if (shouldRoundTwoDecimals && !Number.isNaN(num)) {
           text = num.toFixed(2);
         }
-
+        
         const isPriceColumn =
           datasetKey === 'tools' &&
           (cleanedHeader.includes('price') || cleanedHeader.includes('cost'));
-
-        if (isPriceColumn && text !== '' && !Number.isNaN(num)) {
+        
+        if (isPriceColumn && !Number.isNaN(num)) {
           text = num.toFixed(2);
         }
+
 
         td.title = text;
 
