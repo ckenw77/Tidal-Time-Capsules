@@ -488,33 +488,44 @@
 
 <header>
   <div class="nav">
-    <!-- EDIT HEADER BRAND -->
-    <div class="brand">Tidal Time Capsules</div>
+    <div class="brand" data-i18n="brand">Tidal Time Capsules</div>
 
-    <nav>
-      <a href="#about">About</a>
-      <a href="#map">Map</a>
-      <a href="#data">Data</a>
-      <a href="#tools">Tools</a>
-      <a href="#contribute">Contribute</a>
-      <a href="#citation">Citation</a>
-      <a href="#contact">Contact</a>
-    </nav>
+    <div class="nav-right">
+      <nav>
+        <a href="#about" data-i18n="nav.about">About</a>
+        <a href="#map" data-i18n="nav.map">Map</a>
+        <a href="#data" data-i18n="nav.data">Data</a>
+        <a href="#tools" data-i18n="nav.tools">Tools</a>
+        <a href="#contribute" data-i18n="nav.contribute">Contribute</a>
+        <a href="#citation" data-i18n="nav.citation">Citation</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
+      </nav>
+
+      <div class="language-control">
+        <label for="language-switcher" data-i18n="language.label">Language</label>
+        <select id="language-switcher">
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="es">Español</option>
+        <option value="de">Deutsch</option>
+        <option value="nl">Nederlands</option>
+        <option value="it">Italiano</option>
+      </select>
+      </div>
+    </div>
   </div>
 </header>
-
+  
 <section class="hero" id="home">
   <div class="hero-inner">
-    <!-- EDIT HERO TITLE -->
-    <h1>Tidal Time Capsules</h1>
+    <h1 data-i18n="hero.title">Tidal Time Capsules</h1>
 
-    <!-- EDIT HERO SUBTITLE -->
-    <p class="subtitle">
+    <p class="subtitle" data-i18n="hero.subtitle">
       A catalogue of known digitised and undigitized historical tide records.
     </p>
 
     <div class="button-row">
-      <a class="button primary" href="#data">Browse Data</a>
+      <a class="button primary" href="#data" data-i18n="hero.button">Browse Data</a>
     </div>
   </div>
 </section>
@@ -523,7 +534,7 @@
 
   <section id="about">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">About</h2>
+    <h2 class="section-title" data-i18n="about.title">About</h2>
 
     <div class="card">
       <!-- EDIT ABOUT TEXT -->
@@ -557,7 +568,7 @@
 
   <section id="map">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">Location of Records</h2>
+    <h2 class="section-title" data-i18n="map.title">Location of Records</h2>
 
     <div class="card">
       <div class="map-controls">
@@ -596,7 +607,7 @@
 
   <section id="data">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">Data</h2>
+    <h2 class="section-title" data-i18n="data.title">>Data</h2>
 
     <div class="data-grid">
       <div class="card">
@@ -709,7 +720,7 @@
 
   <section id="tools">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">Inventory of Digitisation Tools</h2>
+    <h2 class="section-title" data-i18n="tools.title">Inventory of Digitisation Tools</h2>
 
     <!-- EDIT SECTION INTRO -->
     <p class="section-intro">
@@ -747,7 +758,7 @@
   </section>
 <section id="contribute">
   <!-- EDIT SECTION HEADING -->
-  <h2 class="section-title">Contribute</h2>
+  <h2 class="section-title" data-i18n="contribute.title">Contribute</h2>
 
   <!-- EDIT SECTION INTRO -->
   <p class="section-intro">
@@ -780,7 +791,7 @@
 
   <section id="citation">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">Citation</h2>
+    <h2 class="section-title" data-i18n="citation.title">Citation</h2>
     <div class="card">
       <div class="citation-block">
         <p class="citation-label">If you use this site, please cite it as:</p>
@@ -805,7 +816,7 @@
 
   <section id="contact">
     <!-- EDIT SECTION HEADING -->
-    <h2 class="section-title">Contact</h2>
+    <h2 class="section-title" data-i18n="contact.title">Contact</h2>
     <div class="card">
       <!-- EDIT CONTACT TEXT -->
       <p>Email: ck1g20@soton.ac.uk</p>
@@ -814,7 +825,7 @@
 
 </main>
 
-<footer>
+<footer data-i18n="footer.text">
   <!-- EDIT FOOTER TEXT -->
   © 2026 Tidal Time Capsules: A Global Catalogue of Historical Tide Records
 </footer>
@@ -1440,7 +1451,193 @@
     }
   }
   
+const translations = {
+  en: {
+    brand: "Tidal Time Capsules",
+    "language.label": "Language",
 
+    "nav.about": "About",
+    "nav.map": "Map",
+    "nav.data": "Data",
+    "nav.tools": "Tools",
+    "nav.contribute": "Contribute",
+    "nav.citation": "Citation",
+    "nav.contact": "Contact",
+
+    "hero.title": "Tidal Time Capsules",
+    "hero.subtitle": "A catalogue of known digitised and undigitized historical tide records.",
+    "hero.button": "Browse Data",
+
+    "about.title": "About",
+    "map.title": "Location of Records",
+    "data.title": "Data",
+    "tools.title": "Inventory of Digitisation Tools",
+    "contribute.title": "Contribute",
+    "citation.title": "Citation",
+    "contact.title": "Contact",
+
+    "contribute.intro": "We welcome contributions that help expand and improve this catalogue.",
+
+    "footer.text": "© 2026 Tidal Time Capsules: A Global Catalogue of Historical Tide Records"
+  },
+
+  fr: {
+    brand: "Capsules Temporelles des Marées",
+    "language.label": "Langue",
+
+    "nav.about": "À propos",
+    "nav.map": "Carte",
+    "nav.data": "Données",
+    "nav.tools": "Outils",
+    "nav.contribute": "Contribuer",
+    "nav.citation": "Citation",
+    "nav.contact": "Contact",
+
+    "hero.title": "Capsules Temporelles des Marées",
+    "hero.subtitle": "Un catalogue des archives historiques des marées numérisées et non numérisées.",
+    "hero.button": "Explorer les données",
+
+    "about.title": "À propos",
+    "map.title": "Localisation des archives",
+    "data.title": "Données",
+    "tools.title": "Inventaire des outils de numérisation",
+    "contribute.title": "Contribuer",
+    "citation.title": "Citation",
+    "contact.title": "Contact",
+
+    "contribute.intro": "Nous accueillons les contributions qui aident à améliorer ce catalogue.",
+
+    "footer.text": "© 2026 Tidal Time Capsules"
+  },
+
+  es: {
+    brand: "Cápsulas del Tiempo de las Mareas",
+    "language.label": "Idioma",
+
+    "nav.about": "Acerca de",
+    "nav.map": "Mapa",
+    "nav.data": "Datos",
+    "nav.tools": "Herramientas",
+    "nav.contribute": "Contribuir",
+    "nav.citation": "Citación",
+    "nav.contact": "Contacto",
+
+    "hero.title": "Cápsulas del Tiempo de las Mareas",
+    "hero.subtitle": "Un catálogo de registros históricos de mareas digitalizados y no digitalizados.",
+    "hero.button": "Explorar datos",
+
+    "about.title": "Acerca de",
+    "map.title": "Ubicación de los registros",
+    "data.title": "Datos",
+    "tools.title": "Inventario de herramientas de digitalización",
+    "contribute.title": "Contribuir",
+    "citation.title": "Citación",
+    "contact.title": "Contacto",
+
+    "contribute.intro": "Agradecemos contribuciones que ayuden a mejorar este catálogo.",
+
+    "footer.text": "© 2026 Tidal Time Capsules"
+  },
+  de: {
+  brand: "Gezeiten-Zeitkapseln",
+  "language.label": "Sprache",
+
+  "nav.about": "Über",
+  "nav.map": "Karte",
+  "nav.data": "Daten",
+  "nav.tools": "Werkzeuge",
+  "nav.contribute": "Beitragen",
+  "nav.citation": "Zitation",
+  "nav.contact": "Kontakt",
+
+  "hero.title": "Gezeiten-Zeitkapseln",
+  "hero.subtitle": "Ein Katalog bekannter digitalisierter und nicht digitalisierter historischer Gezeitenaufzeichnungen.",
+  "hero.button": "Daten durchsuchen",
+
+  "about.title": "Über",
+  "map.title": "Standorte der Aufzeichnungen",
+  "data.title": "Daten",
+  "tools.title": "Inventar der Digitalisierungswerkzeuge",
+  "contribute.title": "Beitragen",
+  "citation.title": "Zitation",
+  "contact.title": "Kontakt",
+
+  "contribute.intro": "Wir freuen uns über Beiträge, die helfen, diesen Katalog zu erweitern und zu verbessern.",
+
+  "footer.text": "© 2026 Tidal Time Capsules: A Global Catalogue of Historical Tide Records"
+},
+nl: {
+  brand: "Getijden-Tijdcapsules",
+  "language.label": "Taal",
+
+  "nav.about": "Over",
+  "nav.map": "Kaart",
+  "nav.data": "Gegevens",
+  "nav.tools": "Hulpmiddelen",
+  "nav.contribute": "Bijdragen",
+  "nav.citation": "Citeren",
+  "nav.contact": "Contact",
+
+  "hero.title": "Getijden-Tijdcapsules",
+  "hero.subtitle": "Een catalogus van bekende gedigitaliseerde en niet-gedigitaliseerde historische getijdengegevens.",
+  "hero.button": "Gegevens bekijken",
+
+  "about.title": "Over",
+  "map.title": "Locaties van de gegevens",
+  "data.title": "Gegevens",
+  "tools.title": "Overzicht van digitaliseringshulpmiddelen",
+  "contribute.title": "Bijdragen",
+  "citation.title": "Citeren",
+  "contact.title": "Contact",
+
+  "contribute.intro": "Bijdragen die helpen deze catalogus uit te breiden en te verbeteren zijn van harte welkom.",
+
+  "footer.text": "© 2026 Tidal Time Capsules: A Global Catalogue of Historical Tide Records"
+},
+it: {
+  brand: "Capsule Temporali delle Maree",
+  "language.label": "Lingua",
+
+  "nav.about": "Informazioni",
+  "nav.map": "Mappa",
+  "nav.data": "Dati",
+  "nav.tools": "Strumenti",
+  "nav.contribute": "Contribuire",
+  "nav.citation": "Citazione",
+  "nav.contact": "Contatto",
+
+  "hero.title": "Capsule Temporali delle Maree",
+  "hero.subtitle": "Un catalogo di registri storici delle maree digitalizzati e non digitalizzati.",
+  "hero.button": "Esplora i dati",
+
+  "about.title": "Informazioni",
+  "map.title": "Posizione dei registri",
+  "data.title": "Dati",
+  "tools.title": "Inventario degli strumenti di digitalizzazione",
+  "contribute.title": "Contribuire",
+  "citation.title": "Citazione",
+  "contact.title": "Contatto",
+
+  "contribute.intro": "Accogliamo con favore contributi che aiutino ad ampliare e migliorare questo catalogo.",
+
+  "footer.text": "© 2026 Tidal Time Capsules: A Global Catalogue of Historical Tide Records"
+}
+};
+
+function setLanguage(lang) {
+  const selected = translations[lang] || translations.en;
+
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (selected[key]) {
+      el.textContent = selected[key];
+    }
+  });
+
+  localStorage.setItem("siteLanguage", lang);
+}
 
   function toggleSort(datasetKey, column) {
     const dataset = datasets[datasetKey];
@@ -1480,12 +1677,24 @@
     container.classList.toggle('active');
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    initialiseMap();
-    loadDataset('digitised');
-    loadDataset('undigitised');
-    loadDataset('tools');
-  });
+window.addEventListener("DOMContentLoaded", () => {
+  initialiseMap();
+  loadDataset("digitised");
+  loadDataset("undigitised");
+  loadDataset("tools");
+
+  const languageSwitcher = document.getElementById("language-switcher");
+  const savedLanguage = localStorage.getItem("siteLanguage") || "en";
+
+  if (languageSwitcher) {
+    languageSwitcher.value = savedLanguage;
+    languageSwitcher.addEventListener("change", (e) => {
+      setLanguage(e.target.value);
+    });
+  }
+
+  setLanguage(savedLanguage);
+});
 </script>
 </body>
 </html>
