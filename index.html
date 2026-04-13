@@ -29,31 +29,22 @@
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
 
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  color: var(--text);
-  line-height: 1.6;
-
-  background: linear-gradient(
-    to bottom,
-    #e6f4fb 0%,     /* light blue */
-    #b3d9f2 30%,
-    #5fa8d3 60%,
-    #0f5c7a 100%    /* dark blue */
-  );
-
-  background-attachment: fixed;
-}
-
-    header {
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background: #e6f4fb;
+      transition: background 0.2s linear;
     }
+        header {
+          background: rgba(255,255,255,0.94);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid var(--border);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
 
     .nav {
       max-width: 1400px;
@@ -1569,6 +1560,19 @@ body {
     loadDataset("undigitised");
     loadDataset("tools");
   });
+
+  window.addEventListener("scroll", () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+  const scrollPercent = scrollTop / docHeight;
+
+  // Interpolate between light blue and dark blue
+  const r = Math.round(230 - (230 - 15) * scrollPercent);
+  const g = Math.round(244 - (244 - 92) * scrollPercent);
+  const b = Math.round(251 - (251 - 122) * scrollPercent);
+
+  document.body.style.background = `rgb(${r}, ${g}, ${b})`;
+});
 </script>
 
 </body>
