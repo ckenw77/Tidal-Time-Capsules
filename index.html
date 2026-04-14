@@ -1129,26 +1129,35 @@
     return { headers, rows };
   }
 
-  function buildPopupContent(row, datasetKey) {
-    const mapCols = datasets[datasetKey].mapColumns;
-    const location = formatPopupValue(row[mapCols.location]);
-    const country = formatPopupValue(row[mapCols.country]);
-    const study = formatPopupValue(row[mapCols.study]);
-    const start = formatPopupValue(row[mapCols.start]);
-    const finish = formatPopupValue(row[mapCols.finish]);
-    const type = formatPopupValue(row[mapCols.type]);
+function buildPopupContent(row, datasetKey) {
+  const mapCols = datasets[datasetKey].mapColumns;
 
-    return `
-      <div>
-        <strong>${location}</strong><br>
-        <strong>Dataset:</strong> ${datasetKey === "digitised" ? "Digitised" : "Undigitized"}<br>
-        <strong>Country:</strong> ${country}<br>
-        <strong>Study:</strong> ${study}<br>
-        <strong>Data type:</strong> ${type}<br>
-        <strong>Years:</strong> ${start}–${finish}
-      </div>
-    `;
-  }
+  const location = formatPopupValue(row[mapCols.location]);
+  const country = formatPopupValue(row[mapCols.country]);
+  const study = formatPopupValue(row[mapCols.study]);
+  const start = formatPopupValue(row[mapCols.start]);
+  const finish = formatPopupValue(row[mapCols.finish]);
+  const type = formatPopupValue(row[mapCols.type]);
+
+  // 👇 This is the key bit: grab the Link column
+  const link = normalizeValue(row["Link"]);
+
+  // If a valid URL exists → make Study clickable
+  const studyHtml = link && /^https?:\/\//i.test(link)
+    ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(study)}</a>`
+    : escapeHtml(study);
+
+  return `
+    <div>
+      <strong>${escapeHtml(location)}</strong><br>
+      <strong>Dataset:</strong> ${datasetKey === "digitised" ? "Digitised" : "Undigitized"}<br>
+      <strong>Country:</strong> ${escapeHtml(country)}<br>
+      <strong>Study:</strong> ${studyHtml}<br>
+      <strong>Data type:</strong> ${escapeHtml(type)}<br>
+      <strong>Years:</strong> ${escapeHtml(start)}–${escapeHtml(finish)}
+    </div>
+  `;
+}
 
   function initialiseMap() {
     map = L.map("map-frame", {
@@ -1563,7 +1572,14 @@
     loadDataset("undigitised");
     loadDataset("tools");
   });
-
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 </script>
 
 </body>
