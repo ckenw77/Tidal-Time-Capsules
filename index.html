@@ -1139,10 +1139,15 @@ function buildPopupContent(row, datasetKey) {
   const finish = formatPopupValue(row[mapCols.finish]);
   const type = formatPopupValue(row[mapCols.type]);
 
-  // 👇 This is the key bit: grab the Link column
-  const link = normalizeValue(row["Link"]);
+  const rawLink = row["Link"];
 
-  // If a valid URL exists → make Study clickable
+  let link = "";
+  if (rawLink && typeof rawLink === "object" && rawLink.url) {
+    link = rawLink.url;
+  } else {
+    link = normalizeValue(rawLink);
+  }
+
   const studyHtml = link && /^https?:\/\//i.test(link)
     ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(study)}</a>`
     : escapeHtml(study);
